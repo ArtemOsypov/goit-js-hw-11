@@ -1,4 +1,5 @@
 import ImagesApiLoad from './js/fetch-image';
+import Notiflix from 'notiflix';
 
 const refs = {
   galleryContainer: document.querySelector('.gallery'),
@@ -9,6 +10,8 @@ const refs = {
 
 refs.input.addEventListener('submit', onSearch);
 refs.btnLoadMore.addEventListener('click', onLoadMore);
+refs.btnLoadMore.disabled = true;
+refs.btnLoadMore.classList.add('is-hidden');
 const imagesApiLoad = new ImagesApiLoad();
 
 function onSearch(e) {
@@ -21,22 +24,24 @@ function onSearch(e) {
   console.log(imagesApiLoad.query);
 
   if (imagesApiLoad.query === '') {
-    console.log('Введите поисковый запрос');
-    return;
+    return Notiflix.Notify.failure('Введите поисковый запрос');
   }
+
   imagesApiLoad
     .fetchImages()
     .then(({ hits, totalHits }) => {
       if (hits.length === 0) {
-        console.log('Ничего не найдено, повторите запрос!');
-        return;
+        return Notiflix.Notify.failure('Ничего не найдено, повторите запрос!');
       }
-      console.log(`найдено ${totalHits} картинок`);
-      console.log(hits);
-      console.log(totalHits);
-      console.log(hits.length);
-
+      Notiflix.Notify.info(`Hooray! We found ${totalHits} images.`);
+      // console.log(`найдено ${totalHits} картинок`);
+      // console.log(hits);
+      // console.log(totalHits);
+      // console.log(hits.length);
+      imagesApiLoad.loadedHits = imagesApiLoad.per_page;
       createGalleryMarkup(hits);
+      refs.btnLoadMore.disabled = false;
+      refs.btnLoadMore.classList.remove('is-hidden');
 
       //   return response.data;
     })
@@ -44,12 +49,27 @@ function onSearch(e) {
 }
 
 function onLoadMore() {
-  imagesApiLoad.incrementLoadedHits();
-  console.log(imagesApiLoad.incrementLoadedHits());
+  // imagesApiLoad.incrementLoadedHits();
+  // console.log(imagesApiLoad.incrementLoadedHits());
   imagesApiLoad
     .fetchImages()
     .then(({ hits, totalHits }) => {
+      if (
+        Math.ceil(totalHits / imagesApiLoad.per_page) === imagesApiLoad.page
+      ) {
+        console.log(totalHits);
+        console.log(imagesApiLoad.per_page);
+        console.log(imagesApiLoad.page);
+        refs.btnLoadMore.disabled = true;
+        return Notiflix.Notify.info(
+          'We are sorry, but you have reached the end of search results.'
+        );
+      }
+      imagesApiLoad.incrementLoadedHits(hits);
       console.log(hits);
+      console.log(totalHits);
+      console.log(imagesApiLoad.per_page);
+      console.log(imagesApiLoad.page);
 
       createGalleryMarkup(hits);
 

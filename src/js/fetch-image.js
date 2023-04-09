@@ -8,24 +8,29 @@ export default class ImagesApiLoad {
     this.searchQuery = '';
     this.page = 1;
     this.loadedHits = 0;
+    this.per_page = 40;
   }
 
   async fetchImages() {
-    const searchParams = new URLSearchParams({
-      key: API_KEY,
-      q: this.searchQuery,
-      image_type: 'photo',
-      orientation: 'horizontal',
-      safesearch: 'true',
-      page: this.page,
-      per_page: 40,
-    });
-    const url = `${BASE_URL}?${searchParams}`;
-    const response = await axios.get(url);
-    this.incrementPage();
-    console.log(this.searchQuery);
+    try {
+      const searchParams = new URLSearchParams({
+        key: API_KEY,
+        q: this.searchQuery,
+        image_type: 'photo',
+        orientation: 'horizontal',
+        safesearch: 'true',
+        page: this.page,
+        per_page: 40,
+      });
+      const url = `${BASE_URL}?${searchParams}`;
+      const response = await axios.get(url);
+      this.incrementPage();
+      console.log(this.searchQuery);
 
-    return response.data;
+      return response.data;
+    } catch (error) {
+      throw new Error(error.message);
+    }
   }
   get query() {
     console.log(this.searchQuery);

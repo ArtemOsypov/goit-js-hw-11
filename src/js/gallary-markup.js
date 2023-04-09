@@ -47,8 +47,6 @@ function createGalleryMarkup(images) {
     .join('');
 
   return markup;
-
-  //   refs.galleryContainer.insertAdjacentHTML('beforeend', markup);
 }
 
 export { createGalleryMarkup };

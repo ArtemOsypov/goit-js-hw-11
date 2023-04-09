@@ -24,8 +24,6 @@ function onSearch(e) {
   imagesApiLoad.resetPage();
   imagesApiLoad.resetLoadedHits();
   clearGelleryContainer();
-  console.log(e.currentTarget.elements.searchQuery.value.trim());
-  console.log(imagesApiLoad.query);
 
   if (imagesApiLoad.query === '') {
     return Notiflix.Notify.failure('Введите поисковый запрос');
@@ -35,7 +33,9 @@ function onSearch(e) {
     .fetchImages()
     .then(({ hits, totalHits }) => {
       if (hits.length === 0) {
-        return Notiflix.Notify.failure('Ничего не найдено, повторите запрос!');
+        return Notiflix.Notify.failure(
+          'Sorry, there are no images matching your search query. Please try again.'
+        );
       }
       Notiflix.Notify.info(`Hooray! We found ${totalHits} images.`);
       imagesApiLoad.loadedHits = imagesApiLoad.per_page;
@@ -55,30 +55,20 @@ function onSearch(e) {
 }
 
 function onLoadMore() {
-  // imagesApiLoad.incrementLoadedHits();
-  // console.log(imagesApiLoad.incrementLoadedHits());
-  imagesApiLoad
-    .fetchImages()
-    .then(({ hits, totalHits }) => {
-      if (
-        Math.ceil(totalHits / imagesApiLoad.per_page) === imagesApiLoad.page
-      ) {
-        console.log(totalHits);
-        console.log(imagesApiLoad.per_page);
-        console.log(imagesApiLoad.page);
-        loadMoreBtnDisabled();
-        return Notiflix.Notify.info(
-          'We are sorry, but you have reached the end of search results.'
-        );
-      }
-      imagesApiLoad.incrementLoadedHits(hits);
-
-      refs.galleryContainer.insertAdjacentHTML(
-        'beforeend',
-        createGalleryMarkup(hits)
+  imagesApiLoad.fetchImages().then(({ hits, totalHits }) => {
+    if (Math.ceil(totalHits / imagesApiLoad.per_page) === imagesApiLoad.page) {
+      loadMoreBtnDisabled();
+      return Notiflix.Notify.info(
+        'We are sorry, but you have reached the end of search results.'
       );
-    })
-    .catch();
+    }
+    imagesApiLoad.incrementLoadedHits(hits);
+
+    refs.galleryContainer.insertAdjacentHTML(
+      'beforeend',
+      createGalleryMarkup(hits)
+    );
+  });
 }
 
 function clearGelleryContainer() {

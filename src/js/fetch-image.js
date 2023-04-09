@@ -25,7 +25,6 @@ export default class ImagesApiLoad {
       const url = `${BASE_URL}?${searchParams}`;
       const response = await axios.get(url);
       this.incrementPage();
-      console.log(this.searchQuery);
 
       return response.data;
     } catch (error) {
@@ -33,7 +32,6 @@ export default class ImagesApiLoad {
     }
   }
   get query() {
-    console.log(this.searchQuery);
     return this.searchQuery;
   }
 
@@ -43,7 +41,6 @@ export default class ImagesApiLoad {
 
   incrementLoadedHits(hits) {
     this.loadedHits += hits.length;
-    console.log(this.loadedHits);
   }
 
   resetLoadedHits() {
